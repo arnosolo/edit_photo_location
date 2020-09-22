@@ -1,0 +1,276 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no"> 
+        <title></title>
+        <style type="text/css">
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                width: 100%;
+                padding: 0;
+                overflow: hidden;
+                font-size: 13px;
+            }
+            
+            .map {
+                height: 100%;
+                width: 60%;
+                float: left;
+            }
+            
+            #right {
+                color: #444;
+                background-color: #f8f8f8;
+                width: 40%;
+                float: left;
+                height: 100%;
+            }
+            
+            #start,
+            #stop,
+            #right input {
+                margin: 4px;
+                margin-left: 15px;
+            }
+            
+            .title {
+                width: 100%;
+                background-color: #dadada
+            }
+            
+            button {
+                border: solid 1px;
+                margin-left: 15px;
+                background-color: #dadafa;
+            }
+            
+            .c {
+                font-weight: 600;
+                padding-left: 15px;
+                padding-top: 4px;
+            }
+            
+            #lnglat,
+            #address,
+            #nearestJunction,
+            #nearestRoad,
+            #nearestPOI,
+            .title {
+                padding-left: 15px;
+            }
+        </style>
+    </head>
+
+    <script src="https://webapi.amap.com/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <script src="./js/piexif.js"></script>
+    <script type="text/javascript" >
+
+        //定义一些常量
+        var x_PI = 3.14159265358979324 * 3000.0 / 180.0;
+        var PI = 3.1415926535897932384626;
+        var a = 6378245.0;
+        var ee = 0.00669342162296594323;
+        /**
+        * GCJ02 转换为 WGS84
+        * @param lng
+        * @param lat
+        * @returns {*[]}
+        */
+        function gcj02towgs84(lng, lat) {
+            if (out_of_china(lng, lat)) {
+                return [lng, lat]
+            }
+            else {
+                var dlat = transformlat(lng - 105.0, lat - 35.0);
+                var dlng = transformlng(lng - 105.0, lat - 35.0);
+                var radlat = lat / 180.0 * PI;
+                var magic = Math.sin(radlat);
+                magic = 1 - ee * magic * magic;
+                var sqrtmagic = Math.sqrt(magic);
+                dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * PI);
+                dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * PI);
+                mglat = lat + dlat;
+                mglng = lng + dlng;
+                return [lng * 2 - mglng, lat * 2 - mglat]
+            }
+        }
+
+        function transformlat(lng, lat) {
+            var ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng));
+            ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
+            ret += (20.0 * Math.sin(lat * PI) + 40.0 * Math.sin(lat / 3.0 * PI)) * 2.0 / 3.0;
+            ret += (160.0 * Math.sin(lat / 12.0 * PI) + 320 * Math.sin(lat * PI / 30.0)) * 2.0 / 3.0;
+            return ret
+        }
+        
+        function transformlng(lng, lat) {
+            var ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng));
+            ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
+            ret += (20.0 * Math.sin(lng * PI) + 40.0 * Math.sin(lng / 3.0 * PI)) * 2.0 / 3.0;
+            ret += (150.0 * Math.sin(lng / 12.0 * PI) + 300.0 * Math.sin(lng / 30.0 * PI)) * 2.0 / 3.0;
+            return ret
+        }
+        
+        /**
+        * 判断是否在国内，不在国内则不做偏移
+        * @param lng
+        * @param lat
+        * @returns {boolean}
+        */
+        function out_of_china(lng, lat) {
+            return (lng < 72.004 || lng > 137.8347) || ((lat < 0.8293 || lat > 55.8271) || false);
+        }
+
+
+        // 记录在地图上选择的点
+        var globalPosition = []
+
+        AMapLoader.load({
+            "key": "9c5c51916fc0a4e7e2cf745fb39ffe2c",              // 申请好的Web端开发者Key，首次调用 load 时必填
+            "version": "1.4.15",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+            "plugins": [],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+            "AMapUI": {             // 是否加载 AMapUI，缺省不加载
+                "version": '1.1',   // AMapUI 缺省 1.1
+                "plugins":['overlay/SimpleMarker'],       // 需要加载的 AMapUI ui插件
+            },
+            "Loca":{                // 是否加载 Loca， 缺省不加载
+                "version": '1.3.2'  // Loca 版本，缺省 1.3.2
+            },
+        }).then((AMap)=>{
+                var map = new AMap.Map('container');
+
+                //加载PositionPicker，loadUI的路径参数为模块名中 'ui/' 之后的部分
+                AMapUI.loadUI(['misc/PositionPicker'], function(PositionPicker) {
+                    var map = new AMap.Map('container',{
+                        zoom:16
+                    })
+                    var positionPicker = new PositionPicker({
+                        mode:'dragMap',//设定为拖拽地图模式，可选'dragMap'、'dragMarker'，默认为'dragMap'
+                        map:map//依赖地图对象
+                    });
+                    //TODO:事件绑定、结果处理等
+                    positionPicker.on('success', function(positionResult) {
+                        // document.getElementById('lnglat').innerHTML = positionResult.position;
+                        document.getElementById('address').innerHTML = positionResult.address;
+                        var {lng,lat} = positionResult.position
+                        // 在全局中记录选定的坐标
+                        var converted = gcj02towgs84(lng,lat)
+                        // document.getElementById('converted').innerHTML = converted;
+                        // console.log(converted);
+                        globalPosition = converted
+                    });
+
+                    positionPicker.start();
+                });
+
+            }).catch((e)=>{
+                console.error(e);  //加载错误提示
+            });   
+
+        
+        /* 定义一些变量 */
+        var file = {}
+
+        /* 函数: 添加文件后的操作
+            - 修改文件对象
+            - 修改预览图片
+            - 把下载按钮的信息改为等待完成
+            */
+        function newInput (target) {
+            // 修改文件对象
+            file = document.getElementById('file-input').files[0];
+            // console.log(file) // 有文件名,大小,修改时间
+
+            // 读取文件
+            var reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onload = function (e) {
+                // 修改预览图片
+                var image = new Image();
+                image.src = e.target.result;
+                image.height = 200;
+                document.getElementById('preview').innerHTML = ''
+                document.getElementById('preview').appendChild(image)
+            }
+
+            // 把下载按钮的信息改为等待完成
+            var downloadBtn = document.getElementById('download-btn')
+            downloadBtn.href = 'javascript:;'
+            downloadBtn.innerText = "等待下载"
+            downloadBtn.download = 'empty'
+        }
+
+        /* 函数: 修改元数据 */
+        function modifyExif(params) {
+            //获取读取我文件的File对象
+            var reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onload = function (e) {
+                // 获取原来的元数据信息
+                var oldExifObj = piexif.load(e.target.result);
+                // console.log('oldExifObj:');
+                // console.log(oldExifObj);
+                // gps由十进制值改为分度值
+                var lng = globalPosition[0]
+                var lat = globalPosition[1]
+                var exifObj = oldExifObj
+                exifObj.GPS[piexif.GPSIFD.GPSLatitudeRef] = lat < 0 ? 'S' : 'N';
+                exifObj.GPS[piexif.GPSIFD.GPSLatitude] = piexif.GPSHelper.degToDmsRational(lat);
+                exifObj.GPS[piexif.GPSIFD.GPSLongitudeRef] = lng < 0 ? 'W' : 'E';
+                exifObj.GPS[piexif.GPSIFD.GPSLongitude] = piexif.GPSHelper.degToDmsRational(lng);    
+                // 将修改后的信息成二进制信息
+                // console.log(exifObj);
+                var exifbytes = piexif.dump(exifObj);
+                // 注入二进制元数据,返回注入后的图片对象
+                var inserted = piexif.insert(exifbytes, e.target.result)
+
+                // 查看修改后的信息
+                var newExifObj = piexif.load(inserted);
+                // console.log('newExifObj');
+                // console.log(newExifObj);
+
+                var downloadBtn = document.getElementById('download-btn')
+                downloadBtn.href = inserted
+                downloadBtn.innerText = "已添加位置信息,请下载"
+                downloadBtn.download = file.name
+
+            }
+        }
+                    
+
+    </script>
+
+
+    <body >
+        <div id="container" class="map" tabindex="0"></div>
+        <div>
+            <div class='c'><h2>为照片添加位置信息</h1></div>
+
+                <div class='c'><h3>1/3 选择照片</h3></div>
+                <input id="file-input" type="file" multiple onchange="newInput()"/>
+                <div id="preview"></div>
+                <div></div>
+        
+                <div class='c'><h3>2/3 拖拽地图以选择位置</h3></div>
+                <!-- <div class='c'>经纬度:</div>
+                <div id='lnglat'>lnglat</div> -->
+                <div class='c'>地址:</div>
+                <div id='address'>address</div>
+                <!-- <div class='c'>转化到gps坐标系:</div>
+                <div id='converted''>address </div> -->
+                <button id="confirm-btn" onclick="modifyExif()">确认使用当前坐标</button>
+                
+                
+                <div class='c'><h3>3/3 向照片注入位置信息,并提供下载</h3></div>
+                <button>
+                    <a href="javascript:;" download="file.jpg" id='download-btn'>等待完成</a>
+                </button>
+        </div>
+        
+    </body>
+
+</html>       
