@@ -6,9 +6,9 @@
         <title></title>
         <style type="text/css">
             .map {
-                width: 400px;
+                width: 100%;
                 height: 400px;
-                /* float: left; */
+                float: left;
             }
 
             .panel {
@@ -20,8 +20,9 @@
             .btn {
                 font-size:larger;
                 height: 40px;
-                
             }
+
+            a:link {color: black; text-decoration:none;}
             
         </style>
     </head>
@@ -137,6 +138,10 @@
         /* 定义一些变量 */
         var file = {}
 
+        function addfile() {
+    　　　　document.getElementById("file-input").click();
+    　　　}
+
         /* 函数: 添加文件后的操作
             - 修改文件对象
             - 修改预览图片
@@ -208,15 +213,13 @@
 
 
     <body>
-        <h2>为照片添加位置信息</h2>
         <div class="panel">
-                
+            <h2>为照片添加位置信息</h2>
+            
             <div class="box">
                 <h3>1/3 选择照片</h3>
-                <input 
-                    id="file-input" type="file" 
-                    multiple onchange="newInput()" class="btn" 
-                    name="选择照片"/>
+                <button onclick="addfile()" class="btn">点击上传图片</button>    
+                <input id="file-input" type="file" multiple onchange="newInput()" style="display:none"/>
                 <div id="preview"></div>
             </div>
             
@@ -228,15 +231,15 @@
                 <div id='lnglat'>lnglat</div> -->
                 <!-- <div>转化到gps坐标系:</div>
                 <div id='converted''>address </div> -->
-                <button id="confirm-btn" onclick="modifyExif()" class="btn">确认使用当前坐标</button>
                 <div id="container" class="map" tabindex="0"></div>
+                <button id="confirm-btn" onclick="modifyExif()" class="btn">确认使用当前位置</button>
             </div>
             
             
             <div class="box">
                 <h3>3/3 向照片注入位置信息,并提供下载</h3>
                 <button class="btn">
-                    <a href="javascript:;" download="file.jpg" id='download-btn'>等待编辑完成</a>
+                    <a href="javascript:;" id='download-btn'>等待编辑完成</a>
                 </button>
             </div>
             <br><br><br><br>
