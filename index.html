@@ -118,27 +118,30 @@
             reader.readAsDataURL(file)
             reader.onload = function (e) {
                 // 获取原来的元数据信息
-                var oldExifObj = piexif.load(e.target.result);
-                // console.log('oldExifObj:');
-                // console.log(oldExifObj);
+                const oldExifObj = piexif.load(e.target.result);
+                console.log('oldExifObj:');
+                console.log(oldExifObj);
+
                 // gps由十进制值改为分度值
-                var lng = globalPosition[0]
-                var lat = globalPosition[1]
-                var exifObj = oldExifObj
+                const lng = globalPosition[0]
+                const lat = globalPosition[1]
+                // 将对象复制一份,避免修改原来对象中的数据
+                var exifObj = JSON.parse(JSON.stringify(oldExifObj))
+                // var exifObj = oldExifObj
                 exifObj.GPS[piexif.GPSIFD.GPSLatitudeRef] = lat < 0 ? 'S' : 'N';
                 exifObj.GPS[piexif.GPSIFD.GPSLatitude] = piexif.GPSHelper.degToDmsRational(lat);
                 exifObj.GPS[piexif.GPSIFD.GPSLongitudeRef] = lng < 0 ? 'W' : 'E';
                 exifObj.GPS[piexif.GPSIFD.GPSLongitude] = piexif.GPSHelper.degToDmsRational(lng);    
                 // 将修改后的信息成二进制信息
                 // console.log(exifObj);
-                var exifbytes = piexif.dump(exifObj);
+                var exifbytes = piexif.dump(exifObj)
                 // 注入二进制元数据,返回注入后的图片对象
                 var inserted = piexif.insert(exifbytes, e.target.result)
 
                 // 查看修改后的信息
-                var newExifObj = piexif.load(inserted);
-                // console.log('newExifObj');
-                // console.log(newExifObj);
+                const newExifObj = piexif.load(inserted);
+                console.log('newExifObj');
+                console.log(newExifObj);
 
                 var downloadBtn = document.getElementById('download-btn')
                 downloadBtn.href = inserted
