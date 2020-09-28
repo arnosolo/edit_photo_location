@@ -35,7 +35,7 @@
         // 存放 地图上选择的点
         var globalPosition = []
         // 存放 输入的文件
-        var file = {}
+        var files = []
 
         window.onload = function(){
             // 加载地图
@@ -89,12 +89,12 @@
             */
         function newInput (target) {
             // 修改文件对象
-            file = document.getElementById('file-input').files[0];
+            files = document.getElementById('file-input').files;
             // console.log(file) // 有文件名,大小,修改时间
 
             // 读取文件
             var reader = new FileReader()
-            reader.readAsDataURL(file)
+            reader.readAsDataURL(files[0])
             reader.onload = function (e) {
                 // 修改预览图片
                 var image = new Image();
@@ -115,7 +115,7 @@
         function modifyExif(params) {
             //获取读取我文件的File对象
             var reader = new FileReader()
-            reader.readAsDataURL(file)
+            reader.readAsDataURL(files[0])
             reader.onload = function (e) {
                 // 获取原来的元数据信息
                 const oldExifObj = piexif.load(e.target.result);
@@ -146,7 +146,7 @@
                 var downloadBtn = document.getElementById('download-btn')
                 downloadBtn.href = inserted
                 downloadBtn.innerText = "已添加位置信息,请下载"
-                downloadBtn.download = file.name
+                downloadBtn.download = files[0].name
 
             }
         }
@@ -194,6 +194,8 @@
                 </button>
             </div>
             <br><br><br><br>
+            <a href="mailto:arno756@outlook.com" style="font-size: large;">联系作者 Arno</a>
+            <br><br><br><br><br>
 
         </div>
         
