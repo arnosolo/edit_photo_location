@@ -135,10 +135,23 @@
                 console.log('newExifObj');
                 console.log(newExifObj);
 
+                // 更新下载按钮
                 var downloadBtn = document.getElementById('download-btn')
                 downloadBtn.href = inserted
-                downloadBtn.innerText = "已添加位置信息,请下载"
+                switch (downloadBtn.innerText) {
+                    case '已添加位置信息,请下载':
+                        downloadBtn.innerText = "再次更新位置信息,请下载"
+                        break;
+                    case '再次更新位置信息,请下载':
+                        downloadBtn.innerText = "已添加位置信息,请下载"
+                        break;
+                    default:
+                        downloadBtn.innerText = "已添加位置信息,请下载"
+                        break;
+                }
                 downloadBtn.download = files[0].name
+                // 更新下载图片
+                document.getElementById('download-img').src = inserted
 
             }
         }
@@ -157,7 +170,6 @@
             <div class="row">
             <div class="col-sm">
                 <div class="card" >
-                    <img src="./img/transparent1.png" class="card-img-top" alt="..." id="preview">
                     <div class="card-body">
                         <h5 class="card-title">1 选择照片</h5>
                         <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
@@ -169,6 +181,7 @@
                             style="display:none"
                             />
                         </a>
+                        <img src="./img/transparent1.png" class="card-img-bottom" alt="..." id="preview">
                     </div>
                 </div>
                 
@@ -186,12 +199,12 @@
                 <div class="col-sm-6">
                     <div class="card">
                         <!-- <img src="" class="card-img-top" alt="..."> -->
-                        <div class="card-img-top map" id="container"></div>
                         <div class="card-body">
                             <h5 class="card-title">2 拖拽地图以选择位置</h5>
-                            <p class="card-text" id='address'>地址</p>
                             <a href="javascript:;" class="btn btn-light" id="confirm-btn" onclick="modifyExif()">确认使用当前位置</a>
+                            <p class="card-text" id='address'>地址</p>
                         </div>
+                        <div class="card-img-top map" id="container"></div>
                     </div>
                     <!-- <h4>2 拖拽地图以选择位置</h4>
                     <div>地址:</div>
@@ -208,10 +221,12 @@
                 <div class="col-sm">
                     <div class="card">
                         <div class="card-body">
-                          <h5 class="card-title">3 下载照片</h5>
-                          <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
-                          <a href="javascript:;" class="btn btn-light" 
-                            id='download-btn' download="photo.jpg">等待编辑完成</a>
+                            <h5 class="card-title">3 下载照片</h5>
+                            <a href="javascript:;" class="btn btn-light" 
+                                id='download-btn' download="photo.jpg">等待编辑完成</a>
+                            <p class="card-text">手机上也可以长按保存照片</p>
+                            <img src="./img/transparent1.png" class="card-img-top" 
+                                alt="photo.jpg" id="download-img" download="photo.jpg">
                         </div>
                     </div>
                     <!-- <h4>3 下载照片</h4>
