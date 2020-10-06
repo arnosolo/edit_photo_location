@@ -10,12 +10,7 @@
             .map {
                 width: 100%;
                 height: 400px;
-                /* float: left; */
             }
-
-            /* #preview {
-                width: 150px;
-            } */
 
             a:link {color: black; text-decoration:none;}
 
@@ -99,7 +94,7 @@
             // 把下载按钮的信息改为等待完成
             var downloadBtn = document.getElementById('download-btn')
             downloadBtn.href = 'javascript:;'
-            downloadBtn.innerText = "等待下载"
+            // downloadBtn.innerText = "等待设定位置"
             downloadBtn.download = 'empty'
         }
 
@@ -139,14 +134,14 @@
                 var downloadBtn = document.getElementById('download-btn')
                 downloadBtn.href = inserted
                 switch (downloadBtn.innerText) {
-                    case '已添加位置信息,请下载':
-                        downloadBtn.innerText = "再次更新位置信息,请下载"
+                    case '已添加位置信息,点我下载':
+                        downloadBtn.innerText = "更新位置信息,点我下载"
                         break;
-                    case '再次更新位置信息,请下载':
-                        downloadBtn.innerText = "已添加位置信息,请下载"
+                    case '更新位置信息,点我下载':
+                        downloadBtn.innerText = "已添加位置信息,点我下载"
                         break;
                     default:
-                        downloadBtn.innerText = "已添加位置信息,请下载"
+                        downloadBtn.innerText = "已添加位置信息,点我下载"
                         break;
                 }
                 downloadBtn.download = files[0].name
@@ -168,54 +163,34 @@
         <h3 align="center">为照片添加位置信息</h3>
         <div class="continer">
             <div class="row">
-            <div class="col-sm">
-                <div class="card" >
-                    <div class="card-body">
-                        <h5 class="card-title">1 选择照片</h5>
-                        <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
-                        <a href="javascript:;" class="btn btn-light" onclick="addfile()">
-                            点我选择照片
-                            <input id="file-input" 
-                            type="file" 
-                            onchange="newInput()" 
-                            style="display:none"
-                            />
-                        </a>
-                        <img src="./img/transparent1.png" class="card-img-bottom" alt="..." id="preview">
+                <div class="col-sm">
+                    <div class="card" >
+                        <div class="card-body">
+                            <h5 class="card-title">1 选择照片</h5>
+                            <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
+                            <a href="javascript:;" class="btn btn-light" onclick="addfile()">
+                                点我选择照片
+                                <input id="file-input" 
+                                type="file" 
+                                onchange="newInput()" 
+                                style="display:none"
+                                />
+                            </a>
+                            <img src="./img/transparent1.png" class="card-img-bottom" alt="..." id="preview">
+                        </div>
                     </div>
+                    
                 </div>
-                
-                <!-- <div class="container"> -->
-                <!-- <h4>1 选择照片</h4>
-                    <button onclick="addfile()" class="btn btn-light">点我选择照片</button>    
-                    <input id="file-input" 
-                        type="file" 
-                        onchange="newInput()" 
-                        style="display:none"
-                    />
-                    <img src="./img/transparent.png" alt="preview" class="img-thumbnail img-fluid" id="preview"> -->
-            </div>
 
                 <div class="col-sm-6">
                     <div class="card">
-                        <!-- <img src="" class="card-img-top" alt="..."> -->
                         <div class="card-body">
                             <h5 class="card-title">2 拖拽地图以选择位置</h5>
                             <a href="javascript:;" class="btn btn-light" id="confirm-btn" onclick="modifyExif()">确认使用当前位置</a>
+                            <div class="card-img-top map" id="container"></div>
                             <p class="card-text" id='address'>地址</p>
                         </div>
-                        <div class="card-img-top map" id="container"></div>
                     </div>
-                    <!-- <h4>2 拖拽地图以选择位置</h4>
-                    <div>地址:</div>
-                    <div id='address'>address</div> -->
-                        <!-- <div>经纬度:</div>
-                        <div id='lnglat'>lnglat</div> -->
-                        <!-- <div>转化到gps坐标系:</div>
-                        <div id='converted''>address </div> -->
-                    <!-- <div id="container" class="map"></div>
-                    <button id="confirm-btn" onclick="modifyExif()" 
-                        class="btn btn-light">确认使用当前位置</button> -->
                 </div>
 
                 <div class="col-sm">
@@ -224,15 +199,11 @@
                             <h5 class="card-title">3 下载照片</h5>
                             <a href="javascript:;" class="btn btn-light" 
                                 id='download-btn' download="photo.jpg">等待编辑完成</a>
-                            <p class="card-text">手机上也可以长按保存照片</p>
                             <img src="./img/transparent1.png" class="card-img-top" 
                                 alt="photo.jpg" id="download-img" download="photo.jpg">
+                            <p class="card-text">手机上也可以长按保存照片</p>
                         </div>
                     </div>
-                    <!-- <h4>3 下载照片</h4>
-                    <button class="btn btn-light">
-                        <a href="javascript:;" id='download-btn' download="photo.jpg">等待编辑完成</a>
-                    </button> -->
                 </div>
 
             </div>
@@ -240,12 +211,6 @@
 
         <br><br><br><br>
         <a href="mailto:arno756@outlook.com" style="font-size: medium;">&nbsp&nbsp&nbsp&nbsp&nbsp联系作者</a>
-        <div class="continer">
-            <div class="row">
-                <div class="col-sm">
-                </div>
-            </div>
-        </div>
         <br><br><br><br>
 
     </body>
