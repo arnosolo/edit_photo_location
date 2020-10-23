@@ -1,6 +1,7 @@
 <template>
   <div class="box">
     <a href="javascript:;" class="btn btn-light" @click="handleClick">使用当前位置</a>
+    <a class="btn btn-light" @click="backToStart">重选照片</a>
     <p>点击后将跳转到完成页面</p>
     <!-- <mt-button type="default" size="normal" @click.native="handleClick" >使用当前位置</mt-button> -->
     <div id="container"></div>
@@ -26,6 +27,9 @@
         const modifiedImg = modifyExif(inputImg, convertedCoordinate)
         setModifiedImg(modifiedImg)
         selecteNav('3')
+      },
+      backToStart() {
+          this.selecteNav('1')
       }
     },
     mounted() {
