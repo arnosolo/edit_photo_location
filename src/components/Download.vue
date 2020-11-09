@@ -15,6 +15,7 @@
             <a class="btn btn-light" @click="switchPayment">向作者投掷两枚硬币</a>
             <div v-show="showPayment">
                 <img src="static/img/alipay_qrcode.jpeg" alt="alipay_qrcode" class="qrcode">
+                <br>
                 <a class="btn btn-light" :href="mailto">联系作者</a>
             </div>
         </div>
