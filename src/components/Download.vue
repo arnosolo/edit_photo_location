@@ -12,7 +12,11 @@
             <img :src="modifiedImg" alt="modifiedImg" class="preview rounded mx-auto d-block">
             <!-- <p>手机上还可以长按下载</p> -->
             <br>
-            <a class="btn btn-light" :href="mailto">联系作者</a>
+            <a class="btn btn-light" @click="switchPayment">向作者投掷两枚硬币</a>
+            <div v-show="showPayment">
+                <img src="static/img/alipay_qrcode.jpeg" alt="alipay_qrcode" class="qrcode">
+                <a class="btn btn-light" :href="mailto">联系作者</a>
+            </div>
         </div>
     </div>
 </template>
@@ -21,13 +25,17 @@
     export default { 
         data() {
             return {
-                mailto: 'mailto:arno756@outlook.com'
+                mailto: 'mailto:arno756@outlook.com',
+                showPayment: false
             }
         },
         props: ['modifiedImg', 'imgName', 'selecteNav'],
         methods: {
             backToStart() {
                 this.selecteNav('1')
+            },
+            switchPayment() {
+                this.showPayment = !this.showPayment
             }
         },
     }
@@ -36,6 +44,9 @@
 <style>
    .preview {
         width: 18rem;
+    }
+    .qrcode {
+        width: 14rem;
     }
     .box {
         text-align : center
